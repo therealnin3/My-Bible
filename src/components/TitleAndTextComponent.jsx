@@ -14,7 +14,6 @@ function TitleAndTextComponent() {
     setSelectedChapter,
     selectedVerse,
     setSelectedVerse,
-    selectedText,
     Bible,
   } = React.useContext(GlobalContext);
 
@@ -111,7 +110,7 @@ function TitleAndTextComponent() {
       </div>
       {/* Paragraph */}
       <div className="flex h-1/2 flex-row w-full gap-3 bg-base-200 px-4 py-2 rounded-lg">
-        <p>{selectedText}</p>
+        <p>{Bible[selectedBook].chapters[selectedChapter][selectedVerse]}</p>
       </div>
     </>
   );

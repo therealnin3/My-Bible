@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   FiPlay,
   FiSquare,
@@ -21,78 +21,74 @@ function PlayButtonsComponent() {
     setSelectedChapter,
     selectedVerse,
     setSelectedVerse,
-    selectedText,
   } = React.useContext(GlobalContext);
 
   // Local variables
-  const [isPaused, setIsPaused] = React.useState(true);
-  const [utterance, setUtterance] = useState(null);
+  const [isPaused, setIsPaused] = useState(true);
   const [isAutoPlay, setIsAutoPlay] = useState(false);
 
+  // Check for autoplay
+  const isAutoPlayRef = useRef(isAutoPlay);
   useEffect(() => {
-    const synth = window.speechSynthesis;
-    const u = new SpeechSynthesisUtterance(selectedText);
-
-    u.onend = () => {
-      synth.cancel();
-      setIsPaused(true);
-      console.log("Finished reading");
-    };
-
-    setUtterance(u);
-    return () => {
-      synth.cancel();
-    };
-  }, [selectedText]);
-
-  const handlePlay = () => {
-    const synth = window.speechSynthesis;
-
-    if (synth.paused) {
-      synth.resume();
-      console.log("Resuming...");
-    } else {
-      synth.speak(utterance);
-      console.log("Reading...");
+    isAutoPlayRef.current = isAutoPlay;
+    if (isAutoPlay && !isPaused) {
+      readText(Bible[selectedBook].chapters[selectedChapter][selectedVerse]);
     }
+  }, [selectedBook, selectedChapter, selectedVerse, isAutoPlay]);
 
+  // Speech Synthesis
+  const synth = window.speechSynthesis;
+  const readText = (text) => {
+    // Create a new SpeechSynthesisUtterance instance
+    console.log("Started reading...");
     setIsPaused(false);
+    const utterance = new SpeechSynthesisUtterance(text);
+
+    utterance.onend = () => {
+      if (isAutoPlayRef.current) {
+        nextVerse();
+        console.log("Naturally stopped, adding new verse...");
+      } else {
+        setIsPaused(true);
+        console.log("Naturally stopped...");
+      }
+    };
+
+    // Speak the text
+    synth.speak(utterance);
   };
 
-  const handlePause = () => {
-    const synth = window.speechSynthesis;
-    synth.pause();
-    console.log("Paused...");
-    setIsPaused(true);
-  };
-
+  // Click stop button
   const handleStop = () => {
-    const synth = window.speechSynthesis;
-    synth.cancel();
-    const u = new SpeechSynthesisUtterance(selectedText);
-    setUtterance(u);
+    console.log("Forcefully stopped...");
     setIsPaused(true);
-    console.log("Stopped and reset");
+    synth.cancel();
   };
 
   const nextVerse = () => {
+    // Check if autoplay is still enabled
+    if (!isAutoPlay) {
+      setIsPaused(true);
+      return;
+    }
+
     // Check if there is a next verse in the same book
     if (
       selectedVerse + 1 <
       Bible[selectedBook].chapters[selectedChapter].length
     ) {
-      setSelectedVerse(selectedVerse + 1);
+      setSelectedVerse((prevVerse) => prevVerse + 1);
     }
 
     // Check if there is a next chapter in the same book
     else if (selectedChapter + 1 < Bible[selectedBook].chapters.length) {
-      setSelectedChapter(selectedChapter + 1);
+      setSelectedChapter((prevChapter) => prevChapter + 1);
       setSelectedVerse(0);
     }
 
     // Check if there is a next book
     else if (selectedBook + 1 < Bible.length) {
-      setSelectedBook(selectedBook + 1);
+      setSelectedBook((prevBook) => prevBook + 1);
       setSelectedChapter(0);
       setSelectedVerse(0);
     }
@@ -106,23 +102,21 @@ function PlayButtonsComponent() {
   };
 
   const previousVerse = () => {
-    // Check if there is previous verse in the same chapter
-    if (selectedVerse - 1 >= 0) {
-      setSelectedVerse(selectedVerse - 1);
-    }
-
-    // Check if there is a previous chapter in the same book
-    else if (selectedChapter - 1 >= 0) {
-      setSelectedChapter(selectedChapter - 1);
-      setSelectedVerse(0);
-    }
-
-    // Check if there is a previous book
-    else if (selectedBook - 1 >= 0) {
-      setSelectedBook(selectedBook - 1);
-      setSelectedChapter(Bible[selectedBook].chapters.length - 1);
-      setSelectedVerse(0);
-    }
+    // // Check if there is previous verse in the same chapter
+    // if (selectedVerse - 1 >= 0) {
+    //   setSelectedVerse(selectedVerse - 1);
+    // }
+    // // Check if there is a previous chapter in the same book
+    // else if (selectedChapter - 1 >= 0) {
+    //   setSelectedChapter(selectedChapter - 1);
+    //   setSelectedVerse(0);
+    // }
+    // // Check if there is a previous book
+    // else if (selectedBook - 1 >= 0) {
+    //   setSelectedBook(selectedBook - 1);
+    //   setSelectedChapter(Bible[selectedBook].chapters.length - 1);
+    //   setSelectedVerse(0);
+    // }
   };
 
   return (
@@ -138,15 +132,18 @@ function PlayButtonsComponent() {
         className="text-content-100 fill-content-100"
       />
       <div
-        onClick={isPaused ? handlePlay : handleStop}
+        onClick={
+          isPaused
+            ? () =>
+                readText(
+                  Bible[selectedBook].chapters[selectedChapter][selectedVerse]
+                )
+            : handleStop
+        }
         className="bg-content-100 w-fit h-fit rounded-full p-4"
       >
         {isPaused ? (
-          <FiPlay
-            onClick={handlePlay}
-            size={24}
-            className="text-base-300 fill-base-300"
-          />
+          <FiPlay size={24} className="text-base-300 fill-base-300" />
         ) : (
           <FiPause size={24} className="text-base-300 fill-base-300" />
         )}
@@ -157,8 +154,6 @@ function PlayButtonsComponent() {
         className="text-content-100 fill-content-100"
       />
       {isAutoPlay ? (
-        <FiToggleLeft onClick={() => setIsAutoPlay(!isAutoPlay)} size={25} />
-      ) : (
         <div className="relative flex flex-col items-center justify-center">
           <FiToggleRight
             onClick={() => setIsAutoPlay(!isAutoPlay)}
@@ -170,6 +165,8 @@ function PlayButtonsComponent() {
             size={6}
           />
         </div>
+      ) : (
+        <FiToggleLeft onClick={() => setIsAutoPlay(!isAutoPlay)} size={25} />
       )}
     </div>
   );

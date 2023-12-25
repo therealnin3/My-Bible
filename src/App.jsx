@@ -18,7 +18,6 @@ function App() {
   const [selectedBook, setSelectedBook] = useState(0);
   const [selectedChapter, setSelectedChapter] = useState(0);
   const [selectedVerse, setSelectedVerse] = useState(0);
-  const [selectedText, setSelectedText] = useState("");
   const [voiceSetting, setVoiceSetting] = useState({
     voiceType: "Defualt",
     voiceSpeed: 50,
@@ -50,12 +49,6 @@ function App() {
     );
   }, [selectedChapter]);
 
-  useEffect(() => {
-    setSelectedText(
-      Bible[selectedBook].chapters[selectedChapter][selectedVerse]
-    );
-  }, [selectedBook, selectedChapter, selectedVerse]);
-
   return (
     <div className="h-screen w-screen flex flex-col bg-base-300 px-10 py-7 relative">
       <Router>
@@ -70,7 +63,6 @@ function App() {
             setSelectedChapter,
             selectedVerse,
             setSelectedVerse,
-            selectedText,
           }}
         >
           <Routes>
