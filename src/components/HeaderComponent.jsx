@@ -15,7 +15,7 @@ function HeaderComponent() {
 
   const navigate = useNavigate();
   const handleRoute = () => {
-    navigate("/Settings");
+    navigate("/My-Bible/Settings");
   };
 
   return (

@@ -18,11 +18,11 @@ function App() {
   const [selectedBook, setSelectedBook] = useState(0);
   const [selectedChapter, setSelectedChapter] = useState(0);
   const [selectedVerse, setSelectedVerse] = useState(0);
-  const [voiceSetting, setVoiceSetting] = useState({
-    voiceType: "Defualt",
-    voiceSpeed: 50,
-    voicePitch: 50,
-  });
+
+  // State variables for pitch, speed, and volume
+  const [voicePitch, setVoicePitch] = useState(50);
+  const [voiceSpeed, setVoiceSpeed] = useState(50);
+  const [voiceVolume, setVoiceVolume] = useState(50);
 
   // Stats for selected book
   const [selectedBookChaptersAmount, setSelectedBookChaptersAmount] =
@@ -63,6 +63,12 @@ function App() {
             setSelectedChapter,
             selectedVerse,
             setSelectedVerse,
+            voicePitch,
+            setVoicePitch,
+            voiceSpeed,
+            setVoiceSpeed,
+            voiceVolume,
+            setVoiceVolume,
           }}
         >
           <Routes>

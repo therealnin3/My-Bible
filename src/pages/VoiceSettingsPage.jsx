@@ -1,8 +1,19 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FiArrowLeft } from "react-icons/fi";
+import { GlobalContext } from "../context/GlobalContext";
 
 function VoiceSettingsPage() {
+  // Global variables
+  const {
+    voicePitch,
+    setVoicePitch,
+    voiceSpeed,
+    setVoiceSpeed,
+    voiceVolume,
+    setVoiceVolume,
+  } = React.useContext(GlobalContext);
+
   const navigate = useNavigate();
   const handleRoute = () => {
     navigate("/");
@@ -21,15 +32,55 @@ function VoiceSettingsPage() {
         </select>
         <div>
           <span>Pitch</span>
-          <input className="w-full" type="range" min="0" max="100" step="1" />
+          <div className="flex flex-row gap-4">
+            <input
+              className="w-full"
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              value={voicePitch}
+              onChange={(e) => setVoicePitch(Number(e.target.value))}
+            />
+            <label className="px-4 py-2 w-16 flex items-center justify-center font-semibold bg-primary text-content-100 rounded-lg">
+              {voicePitch}
+            </label>
+          </div>
         </div>
         <div>
           <span>Speed</span>
-          <input className="w-full" type="range" min="0" max="100" step="1" />
+          <div className="flex flex-row gap-4">
+            <input
+              className="w-full"
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              value={voiceSpeed}
+              onChange={(e) => setVoiceSpeed(Number(e.target.value))}
+            />
+            <label className="px-4 py-2 w-16 flex items-center justify-center font-semibold bg-primary text-content-100 rounded-lg">
+              {voiceSpeed}
+            </label>
+          </div>
         </div>
         <div>
           <span>Volume</span>
-          <input className="w-full" type="range" min="0" max="100" step="1" />
+          <div className="flex flex-row gap-4">
+            <input
+              id="volume"
+              className="w-full"
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              value={voiceVolume}
+              onChange={(e) => setVoiceVolume(Number(e.target.value))}
+            />
+            <label className="px-4 py-2 w-16 flex items-center justify-center font-semibold bg-primary text-content-100 rounded-lg">
+              {voiceVolume}
+            </label>
+          </div>
         </div>
       </div>
     </div>
