@@ -66,9 +66,9 @@ function App() {
           }}
         >
           <Routes>
-            <Route path="/Settings" element={<VoiceSettingsPage />} />
+            <Route path="/My-Bible/Settings" element={<VoiceSettingsPage />} />
             <Route
-              path="/"
+              path="/My-Bible/"
               element={
                 <>
                   <HeaderComponent />
