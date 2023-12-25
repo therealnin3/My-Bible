@@ -15,6 +15,7 @@ function TitleAndTextComponent() {
     selectedVerse,
     setSelectedVerse,
     selectedText,
+    Bible,
   } = React.useContext(GlobalContext);
 
   // Local variables
@@ -36,7 +37,7 @@ function TitleAndTextComponent() {
         <FiBookOpen size={24} />
         {/* Book-Name */}
         <div className="flex flex-1 flex-row gap-1">
-          <span className="font-semibold">{selectedBook}</span>
+          <span className="font-semibold">{Bible[selectedBook].name}</span>
         </div>
         {/* Chapter-AND-Verse */}
         <div className="flex flex-row gap-1">

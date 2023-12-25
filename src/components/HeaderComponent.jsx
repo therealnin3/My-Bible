@@ -1,15 +1,22 @@
 import React, { useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 import { FiMoreHorizontal, FiMenu, FiX } from "react-icons/fi";
 import { GlobalContext } from "../context/GlobalContext";
 import DropDownMenuItem from "./DropDownMenuItem";
 
 function HeaderComponent() {
   // Global variables
-  const { allBooks, setSelectedBook } = React.useContext(GlobalContext);
+  const { Bible, setSelectedBook } = React.useContext(GlobalContext);
 
   // Local variables
-  const [isSelectingBook, setIsSelectingBook] = useState(true);
+  const [isSelectingBook, setIsSelectingBook] = useState(false);
+  const [isOpeningSettings, setIsOpeningSettings] = useState(false);
+  const [allBooks] = useState(Bible.map((book) => book.name));
+
+  const navigate = useNavigate();
+  const handleRoute = () => {
+    navigate("/Settings");
+  };
 
   return (
     <>
@@ -18,7 +25,11 @@ function HeaderComponent() {
           isSelectingBook ? "w-60 p-4" : "w-0 p-0 overflow-hidden"
         } absolute inset-0 transition-all duration-300 bg-base-100 flex flex-col rounded-lg z-50 `}
       >
-        <div className="flex px-4 pt-2 pb-4 items-center justify-between">
+        <div
+          className={`${
+            isSelectingBook ? "" : "w-0"
+          } flex overflow-hidden px-4 pt-2 pb-4 items-center justify-between`}
+        >
           <label className="text-lg font-semibold whitespace-nowrap">
             Select a book
           </label>
@@ -29,12 +40,12 @@ function HeaderComponent() {
           />
         </div>
         <div className="flex flex-col overflow-auto">
-          {allBooks.map((bookName) => (
+          {allBooks.map((bookName, index) => (
             <DropDownMenuItem
-              key={bookName}
+              key={index}
               itemValue={bookName}
               onClick={() => {
-                setSelectedBook(bookName);
+                setSelectedBook(index);
                 setIsSelectingBook(!isSelectingBook);
               }}
             />
@@ -47,7 +58,24 @@ function HeaderComponent() {
           size={24}
         />
         <span className="text-lg font-semibold">Currently playing</span>
-        <FiMoreHorizontal size={24} className="text-primary" />
+        <div className="relative">
+          <FiMoreHorizontal
+            onClick={() => setIsOpeningSettings(!isOpeningSettings)}
+            size={24}
+            className="text-primary"
+          />
+
+          <div
+            className={`${
+              isOpeningSettings ? "h-fit px-3 py-2 w-fit" : "h-0 w-0"
+            } absolute right-1 z-50 top-10 bg-base-100 rounded-lg transition-all overflow-hidden`}
+          >
+            <DropDownMenuItem
+              onClick={handleRoute}
+              itemValue={"Voice Settings"}
+            />
+          </div>
+        </div>
       </div>
     </>
   );
