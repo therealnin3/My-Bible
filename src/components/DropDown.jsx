@@ -34,13 +34,13 @@ function DropDown({ selectedItem, setSelectedItem, maxNumber, bookNames }) {
           tabIndex={0}
           className="dropdown-content h-52 flex flex-col overflow-y-auto z-[1] w-fit menu p-2 shadow bg-base-100 rounded-box"
         >
-          {bookNames.map((bookName, index) => (
+          {bookNames.map((_, index) => (
             <li
               className="w-fit"
               key={index}
-              onClick={() => setSelectedItem(index + 1)}
+              onClick={() => setSelectedItem(index)}
             >
-              <a>{bookName}</a>
+              <a>{bookNames[index]}</a>
             </li>
           ))}
         </ul>
