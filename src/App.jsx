@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { openDB } from "idb";
 
+//TODO: BUG -- select big chapter, switch to book with fewer chapters
+
 // Import icons
 import { FiPlay, FiSkipBack, FiSkipForward, FiPause } from "react-icons/fi";
 
@@ -32,7 +34,6 @@ function App() {
   // When user selects a new book by dropdown, reset chapter and verse
   const [changeBookByDropDown, setChangeBookByDropDown] = useState(false);
   useEffect(() => {
-    console.log("changeBookByDropDown");
     setChapter(0);
     setVerse(0);
     setChangeBookByDropDown(false);
@@ -41,7 +42,6 @@ function App() {
   // When user selects a new chapter by dropdown, reset verse
   const [changeChapterByDropDown, setChangeChapterByDropDown] = useState(false);
   useEffect(() => {
-    console.log("changeChapterByDropDown");
     setVerse(0);
     setChangeChapterByDropDown(false);
   }, [changeChapterByDropDown]);
@@ -123,13 +123,25 @@ function App() {
   }
 
   // Text to speech
+  const [progressBar, setProgressBar] = useState(0);
   const startPlayingText = (text) => {
+    const words = text.split(" ");
+    let wordCounter = 0;
+
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = "en-US";
     utterance.rate = 4;
     utterance.pitch = 1;
+
+    utterance.onboundary = (event) => {
+      if (event.name === "word") {
+        wordCounter += 1;
+        const progress = (wordCounter / words.length) * 100;
+        setProgressBar(progress);
+      }
+    };
+
     utterance.onend = () => {
-      console.log("Finished reading text.");
       const nextVerseText = nextVerse();
       setBook(bookRef.current);
       setChapter(chapterRef.current);
@@ -141,17 +153,84 @@ function App() {
 
   // Text to speech
   const stopPlayingText = () => {
-    console.log("Forcefully stopped reading text.");
+    console.log("Stop reading.");
     window.speechSynthesis.cancel();
+    setProgressBar(0);
   };
+
+  // Sliders
+  const [volume, setVolume] = useState(40);
+  const [speed, setSpeed] = useState(50);
+  const [pitch, setPitch] = useState(40);
 
   return (
     <div className="w-screen h-screen p-4 bg-red-500 flex flex-col">
-      {displaySkeleton ? (
-        <div></div>
+      {displaySkeleton || Bible === null ? (
+        <div>SKELETON</div>
       ) : (
         <>
-          <header className="w-full h-28 bg-green-500"></header>
+          <header className="w-full h-28 bg-green-500">
+            <button
+              className="btn"
+              onClick={() => document.getElementById("my_modal_3").showModal()}
+            >
+              open modal
+            </button>
+            <dialog id="my_modal_3" className="modal p-4 w-full h-full">
+              <div className="w-full modal-box max-h-screen h-full rounded-lg p-4 flex flex-col">
+                <form method="dialog">
+                  {/* if there is a button in form, it will close the modal */}
+                  <button className="btn">X</button>
+                </form>
+
+                <div className="dropdown">
+                  <div tabIndex={0} role="button" className="btn m-1">
+                    Click
+                  </div>
+                  <ul
+                    tabIndex={0}
+                    className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+                  >
+                    <li>
+                      <a>Item 1</a>
+                    </li>
+                    <li>
+                      <a>Item 2</a>
+                    </li>
+                  </ul>
+                </div>
+                <div className="flex flex-col gap-4">
+                  <input
+                    id="volume"
+                    type="range"
+                    min={0}
+                    max="100"
+                    value={volume}
+                    onChange={(e) => setVolume(e.target.value)}
+                    className="range range-primary"
+                  />
+                  <input
+                    id="Speed"
+                    type="range"
+                    min={0}
+                    max="100"
+                    value={speed}
+                    onChange={(e) => setSpeed(e.target.value)}
+                    className="range range-primary"
+                  />
+                  <input
+                    id="Pitch"
+                    type="range"
+                    min={0}
+                    max="100"
+                    value={pitch}
+                    onChange={(e) => setPitch(e.target.value)}
+                    className="range range-primary"
+                  />
+                </div>
+              </div>
+            </dialog>
+          </header>
           <main className="flex flex-1 bg-yellow-500">
             <div className="flex w-full flex-col gap-2 my-3">
               <div className="flex flex-row w-full bg-purple-500 rounded-lg p-4">
@@ -190,18 +269,16 @@ function App() {
                 </span>
               </div>
               <div className="flex flex-1 bg-purple-500 rounded-lg p-4">
-                {
-                  Bible[bookRef.current].chapters[chapterRef.current][
-                    verseRef.current
-                  ]
-                }
+                {Bible[book].chapters[chapter][verse]}
               </div>
             </div>
           </main>
           <footer className="w-full h-52 bg-blue-500 flex gap-4 flex-col justify-center items-center">
-            <div className="h-2 w-full relative rounded-lg bg-orange-500">
-              <div className="h-full w-1/2 absolute rounded-lg bg-pink-500"></div>
-            </div>
+            <progress
+              className="progress progress-primary w-full"
+              value={progressBar}
+              max="100"
+            ></progress>
             <div className="w-full items-center justify-center flex flex-row gap-2">
               <div className="p-2 rounded-lg bg-yellow-500">
                 <FiSkipBack
@@ -221,11 +298,7 @@ function App() {
                 {isPaused ? (
                   <FiPlay
                     onClick={() => {
-                      startPlayingText(
-                        Bible[bookRef.current].chapters[chapterRef.current][
-                          verseRef.current
-                        ]
-                      );
+                      startPlayingText(Bible[book].chapters[chapter][verse]);
                       setIsPaused(false);
                     }}
                     size={24}
