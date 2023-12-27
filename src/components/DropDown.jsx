@@ -2,10 +2,14 @@ import React from "react";
 
 function DropDown({
   selectedItem,
+  selectedRef,
   setSelectedItem,
   maxNumber,
   bookNames,
   setChangeBookByDropDown,
+  setChangeChapterByDropDown,
+  stopPlayingText,
+  setIsPaused,
 }) {
   if (maxNumber) {
     const numbers = [...Array(maxNumber).keys()];
@@ -22,7 +26,16 @@ function DropDown({
             <li
               className="w-fit"
               key={number}
-              onClick={() => setSelectedItem(number)}
+              onClick={() => {
+                setSelectedItem(number);
+                selectedRef.current = number;
+                stopPlayingText();
+                setIsPaused(true);
+                {
+                  setChangeChapterByDropDown &&
+                    setChangeChapterByDropDown(true);
+                }
+              }}
             >
               <a>{number + 1}</a>
             </li>
@@ -46,7 +59,10 @@ function DropDown({
               key={index}
               onClick={() => {
                 setSelectedItem(index);
+                selectedRef.current = index;
                 setChangeBookByDropDown(true);
+                stopPlayingText();
+                setIsPaused(true);
               }}
             >
               <a>{bookName}</a>
