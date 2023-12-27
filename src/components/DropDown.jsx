@@ -1,12 +1,18 @@
 import React from "react";
 
-function DropDown({ selectedItem, setSelectedItem, maxNumber, bookNames }) {
+function DropDown({
+  selectedItem,
+  setSelectedItem,
+  maxNumber,
+  bookNames,
+  setChangeBookByDropDown,
+}) {
   if (maxNumber) {
-    const numbers = Array.from({ length: maxNumber }, (_, index) => index + 1);
+    const numbers = [...Array(maxNumber).keys()];
     return (
       <div className="dropdown dropdown-bottom dropdown-end">
         <div tabIndex={0} role="button" className="btn m-1">
-          {selectedItem}
+          {selectedItem + 1}
         </div>
         <ul
           tabIndex={0}
@@ -18,7 +24,7 @@ function DropDown({ selectedItem, setSelectedItem, maxNumber, bookNames }) {
               key={number}
               onClick={() => setSelectedItem(number)}
             >
-              <a>{number}</a>
+              <a>{number + 1}</a>
             </li>
           ))}
         </ul>
@@ -28,19 +34,22 @@ function DropDown({ selectedItem, setSelectedItem, maxNumber, bookNames }) {
     return (
       <div className="dropdown">
         <div tabIndex={0} role="button" className="btn m-1">
-          {selectedItem}
+          {bookNames[selectedItem]}
         </div>
         <ul
           tabIndex={0}
           className="dropdown-content h-52 flex flex-col overflow-y-auto z-[1] w-fit menu p-2 shadow bg-base-100 rounded-box"
         >
-          {bookNames.map((_, index) => (
+          {bookNames.map((bookName, index) => (
             <li
               className="w-fit"
               key={index}
-              onClick={() => setSelectedItem(index)}
+              onClick={() => {
+                setSelectedItem(index);
+                setChangeBookByDropDown(true);
+              }}
             >
-              <a>{bookNames[index]}</a>
+              <a>{bookName}</a>
             </li>
           ))}
         </ul>
