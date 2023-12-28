@@ -193,22 +193,22 @@ function App() {
       {displaySkeleton || Bible === null ? (
         <div>SKELETON</div>
       ) : (
-        <>
-          <header className="flex w-full flex-row items-center justify-evenly">
-            <FiExternalLink size={24} />
+        <div className="flex h-full w-full flex-col gap-3">
+          <header className="flex w-full flex-row items-center justify-between">
+            <FiExternalLink className="text-primary" size={20} />
             <div className="flex flex-row items-center gap-2">
-              <FiBook size={24} />
-              <label className="text-2xl font-semibold">My audio Bible</label>
+              <FiBook size={20} />
+              <label className="text-lg font-semibold">Audio Bible</label>
             </div>
             <button
-              className="btn btn-primary"
+              className=""
               onClick={() => {
                 document.getElementById("my_modal_3").showModal();
                 setIsPaused(true);
                 stopPlayingText();
               }}
             >
-              <FiSettings size={24} />
+              <FiSettings className="text-primary" size={20} />
             </button>
             <dialog id="my_modal_3" className="modal h-full w-full p-4">
               <div className="modal-box flex h-full max-h-screen w-full flex-col rounded-lg p-4">
@@ -266,10 +266,10 @@ function App() {
               </div>
             </dialog>
           </header>
-          <main className="flex flex-1 bg-yellow-500">
-            <div className="my-3 flex w-full flex-col gap-2">
-              <div className="flex w-full flex-row rounded-lg bg-purple-500 p-4">
-                <span>
+          <main className="flex flex-1">
+            <div className="flex w-full flex-col gap-3">
+              <div className="flex w-full flex-row items-center justify-center rounded-lg bg-base-300 px-5 py-3">
+                <span className="flex-1">
                   <DropDown
                     selectedItem={book}
                     selectedRef={bookRef}
@@ -278,6 +278,7 @@ function App() {
                     setChangeBookByDropDown={setChangeBookByDropDown}
                     stopPlayingText={stopPlayingText}
                     setIsPaused={setIsPaused}
+                    icon={"right"}
                   />
                 </span>
                 <span className="flex flex-row gap-2">
@@ -289,6 +290,7 @@ function App() {
                     setChangeChapterByDropDown={setChangeChapterByDropDown}
                     stopPlayingText={stopPlayingText}
                     setIsPaused={setIsPaused}
+                    icon={"left"}
                   />
                   <label>:</label>
                   <DropDown
@@ -300,36 +302,36 @@ function App() {
                     }
                     stopPlayingText={stopPlayingText}
                     setIsPaused={setIsPaused}
+                    icon={"right"}
                   />
                 </span>
               </div>
-              <div className="flex flex-1 rounded-lg bg-purple-500 p-4">
+              <div className="flex flex-1 rounded-lg bg-base-300 px-5 py-3">
                 {Bible[book].chapters[chapter][verse]}
               </div>
             </div>
           </main>
-          <footer className="flex h-52 w-full flex-col items-center justify-center gap-4 bg-blue-500">
+          <footer className="flex w-full flex-col items-center justify-center gap-3 rounded-lg bg-base-300 px-5 py-3">
             <progress
               className="progress progress-primary w-full"
               value={progressBar}
               max="100"
             ></progress>
-            <div className="flex w-full flex-row items-center justify-center gap-2">
-              <div className="rounded-lg bg-yellow-500 p-2">
-                <FiSkipBack
-                  onClick={() => {
-                    previousVerse();
-                    stopPlayingText();
-                    setIsPaused(true);
-                    setBook(bookRef.current);
-                    setChapter(chapterRef.current);
-                    setVerse(verseRef.current);
-                  }}
-                  size={24}
-                  className="fill-purple-500 text-purple-500"
-                />
-              </div>
-              <div className="rounded-lg bg-yellow-500 p-2">
+            <div className="flex w-full flex-row items-center justify-center gap-3">
+              <FiSkipBack
+                onClick={() => {
+                  previousVerse();
+                  stopPlayingText();
+                  setIsPaused(true);
+                  setBook(bookRef.current);
+                  setChapter(chapterRef.current);
+                  setVerse(verseRef.current);
+                }}
+                size={24}
+                className="fill-base-content text-base-content"
+              />
+
+              <div className="rounded-full bg-base-content p-4">
                 {isPaused ? (
                   <FiPlay
                     onClick={() => {
@@ -337,7 +339,7 @@ function App() {
                       setIsPaused(false);
                     }}
                     size={24}
-                    className="fill-purple-500 text-purple-500"
+                    className="fill-base-300 text-base-300"
                   />
                 ) : (
                   <FiPause
@@ -346,27 +348,26 @@ function App() {
                       setIsPaused(true);
                     }}
                     size={24}
-                    className="fill-purple-500 text-purple-500"
+                    className="fill-base-300 text-base-300"
                   />
                 )}
               </div>
-              <div className="rounded-lg bg-yellow-500 p-2">
-                <FiSkipForward
-                  onClick={() => {
-                    nextVerse();
-                    stopPlayingText();
-                    setIsPaused(true);
-                    setBook(bookRef.current);
-                    setChapter(chapterRef.current);
-                    setVerse(verseRef.current);
-                  }}
-                  size={24}
-                  className="fill-purple-500 text-purple-500"
-                />
-              </div>
+
+              <FiSkipForward
+                onClick={() => {
+                  nextVerse();
+                  stopPlayingText();
+                  setIsPaused(true);
+                  setBook(bookRef.current);
+                  setChapter(chapterRef.current);
+                  setVerse(verseRef.current);
+                }}
+                size={24}
+                className="fill-base-content text-base-content"
+              />
             </div>
           </footer>
-        </>
+        </div>
       )}
     </div>
   );

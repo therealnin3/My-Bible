@@ -1,4 +1,5 @@
 import React from "react";
+import { FiChevronDown } from "react-icons/fi";
 
 function DropDown({
   selectedItem,
@@ -10,17 +11,29 @@ function DropDown({
   setChangeChapterByDropDown,
   stopPlayingText,
   setIsPaused,
+  icon,
 }) {
   if (maxNumber) {
     const numbers = [...Array(maxNumber).keys()];
     return (
-      <div className="dropdown dropdown-bottom dropdown-end">
-        <div tabIndex={0} role="button" className="btn m-1">
+      <div className="dropdown dropdown-end dropdown-bottom">
+        <div
+          tabIndex={0}
+          role="button"
+          className="flex flex-row items-center gap-2"
+        >
+          {icon === "left" && (
+            <FiChevronDown size={20} className="text-primary" />
+          )}
           {selectedItem + 1}
+          {icon === "right" && (
+            <FiChevronDown size={20} className="text-primary" />
+          )}
         </div>
+
         <ul
           tabIndex={0}
-          className="w-fit dropdown-content h-52 flex flex-col overflow-y-auto z-[1] menu p-2 shadow bg-base-100 rounded-box"
+          className="menu dropdown-content z-[1] flex h-52 w-fit flex-col overflow-y-auto rounded-box bg-base-100 p-2 shadow"
         >
           {numbers.map((number) => (
             <li
@@ -46,12 +59,22 @@ function DropDown({
   } else {
     return (
       <div className="dropdown">
-        <div tabIndex={0} role="button" className="btn m-1">
+        <div
+          tabIndex={0}
+          role="button"
+          className="flex flex-row items-center gap-2"
+        >
+          {icon === "left" && (
+            <FiChevronDown size={20} className="text-primary" />
+          )}
           {bookNames[selectedItem]}
+          {icon === "right" && (
+            <FiChevronDown size={20} className="text-primary" />
+          )}
         </div>
         <ul
           tabIndex={0}
-          className="dropdown-content h-52 flex flex-col overflow-y-auto z-[1] w-fit menu p-2 shadow bg-base-100 rounded-box"
+          className="menu dropdown-content z-[1] flex h-52 w-fit flex-col overflow-y-auto rounded-box bg-base-100 p-2 shadow"
         >
           {bookNames.map((bookName, index) => (
             <li
