@@ -6,7 +6,15 @@ import "./index.css";
 //TODO: BUG -- select big chapter, switch to book with fewer chapters
 
 // Import icons
-import { FiPlay, FiSkipBack, FiSkipForward, FiPause } from "react-icons/fi";
+import {
+  FiPlay,
+  FiBook,
+  FiSkipBack,
+  FiSkipForward,
+  FiPause,
+  FiExternalLink,
+  FiSettings,
+} from "react-icons/fi";
 
 // Import components
 import DropDown from "./components/DropDown";
@@ -181,24 +189,29 @@ function App() {
   const [pitch, setPitch] = useState(1);
 
   return (
-    <div className="w-screen h-screen p-4 bg-red-500 flex flex-col">
+    <div className="flex h-screen w-screen flex-col bg-base-100 p-9 text-base-content">
       {displaySkeleton || Bible === null ? (
         <div>SKELETON</div>
       ) : (
         <>
-          <header className="w-full h-28 bg-green-500">
+          <header className="flex w-full flex-row items-center justify-evenly">
+            <FiExternalLink size={24} />
+            <div className="flex flex-row items-center gap-2">
+              <FiBook size={24} />
+              <label className="text-2xl font-semibold">My audio Bible</label>
+            </div>
             <button
-              className="btn"
+              className="btn btn-primary"
               onClick={() => {
                 document.getElementById("my_modal_3").showModal();
                 setIsPaused(true);
                 stopPlayingText();
               }}
             >
-              voice settings
+              <FiSettings size={24} />
             </button>
-            <dialog id="my_modal_3" className="modal p-4 w-full h-full">
-              <div className="w-full modal-box max-h-screen h-full rounded-lg p-4 flex flex-col">
+            <dialog id="my_modal_3" className="modal h-full w-full p-4">
+              <div className="modal-box flex h-full max-h-screen w-full flex-col rounded-lg p-4">
                 <form method="dialog">
                   {/* if there is a button in form, it will close the modal */}
                   <button className="btn">X</button>
@@ -210,7 +223,7 @@ function App() {
                   </div>
                   <ul
                     tabIndex={0}
-                    className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+                    className="menu dropdown-content z-[1] w-52 rounded-box bg-base-100 p-2 shadow"
                   >
                     {voicesList.map((voice) => (
                       <li
@@ -254,8 +267,8 @@ function App() {
             </dialog>
           </header>
           <main className="flex flex-1 bg-yellow-500">
-            <div className="flex w-full flex-col gap-2 my-3">
-              <div className="flex flex-row w-full bg-purple-500 rounded-lg p-4">
+            <div className="my-3 flex w-full flex-col gap-2">
+              <div className="flex w-full flex-row rounded-lg bg-purple-500 p-4">
                 <span>
                   <DropDown
                     selectedItem={book}
@@ -290,19 +303,19 @@ function App() {
                   />
                 </span>
               </div>
-              <div className="flex flex-1 bg-purple-500 rounded-lg p-4">
+              <div className="flex flex-1 rounded-lg bg-purple-500 p-4">
                 {Bible[book].chapters[chapter][verse]}
               </div>
             </div>
           </main>
-          <footer className="w-full h-52 bg-blue-500 flex gap-4 flex-col justify-center items-center">
+          <footer className="flex h-52 w-full flex-col items-center justify-center gap-4 bg-blue-500">
             <progress
               className="progress progress-primary w-full"
               value={progressBar}
               max="100"
             ></progress>
-            <div className="w-full items-center justify-center flex flex-row gap-2">
-              <div className="p-2 rounded-lg bg-yellow-500">
+            <div className="flex w-full flex-row items-center justify-center gap-2">
+              <div className="rounded-lg bg-yellow-500 p-2">
                 <FiSkipBack
                   onClick={() => {
                     previousVerse();
@@ -313,10 +326,10 @@ function App() {
                     setVerse(verseRef.current);
                   }}
                   size={24}
-                  className="text-purple-500 fill-purple-500"
+                  className="fill-purple-500 text-purple-500"
                 />
               </div>
-              <div className="p-2 rounded-lg bg-yellow-500">
+              <div className="rounded-lg bg-yellow-500 p-2">
                 {isPaused ? (
                   <FiPlay
                     onClick={() => {
@@ -324,7 +337,7 @@ function App() {
                       setIsPaused(false);
                     }}
                     size={24}
-                    className="text-purple-500 fill-purple-500"
+                    className="fill-purple-500 text-purple-500"
                   />
                 ) : (
                   <FiPause
@@ -333,11 +346,11 @@ function App() {
                       setIsPaused(true);
                     }}
                     size={24}
-                    className="text-purple-500 fill-purple-500"
+                    className="fill-purple-500 text-purple-500"
                   />
                 )}
               </div>
-              <div className="p-2 rounded-lg bg-yellow-500">
+              <div className="rounded-lg bg-yellow-500 p-2">
                 <FiSkipForward
                   onClick={() => {
                     nextVerse();
@@ -348,7 +361,7 @@ function App() {
                     setVerse(verseRef.current);
                   }}
                   size={24}
-                  className="text-purple-500 fill-purple-500"
+                  className="fill-purple-500 text-purple-500"
                 />
               </div>
             </div>
