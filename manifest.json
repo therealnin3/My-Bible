@@ -1,0 +1,15 @@
+{
+    "short_name": "AB",
+    "name": "Audio Bible",
+    "icons": [
+      {
+        "src": "./src/assets/icon_test.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ],
+    "start_url": "/My-Bible/",
+    "background_color": "#ffffff",
+    "theme_color": "#000000",
+    "display": "standalone"
+   }
