@@ -1,5 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { openDB } from "idb";
+import Slider from "./components/Slider";
+import "./index.css";
 
 //TODO: BUG -- select big chapter, switch to book with fewer chapters
 
@@ -49,6 +51,18 @@ function App() {
   // Create database on first load
   useEffect(() => {
     createDatabase();
+
+    const synth = window.speechSynthesis;
+
+    const populateVoices = () => {
+      setVoicesList(synth.getVoices());
+      setSelectedVoice(synth.getVoices()[0]);
+    };
+
+    populateVoices();
+    if (synth.onvoiceschanged !== undefined) {
+      synth.onvoiceschanged = populateVoices;
+    }
   }, []);
 
   // Set Book, chapterRef, verseRef to next verseRef
@@ -129,9 +143,11 @@ function App() {
     let wordCounter = 0;
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "en-US";
-    utterance.rate = 4;
-    utterance.pitch = 1;
+    utterance.voice = selectedVoice;
+    utterance.lang = selectedVoice.lang;
+    utterance.volume = volume / 100;
+    utterance.rate = speed;
+    utterance.pitch = pitch;
 
     utterance.onboundary = (event) => {
       if (event.name === "word") {
@@ -153,15 +169,16 @@ function App() {
 
   // Text to speech
   const stopPlayingText = () => {
-    console.log("Stop reading.");
     window.speechSynthesis.cancel();
     setProgressBar(0);
   };
 
   // Sliders
-  const [volume, setVolume] = useState(40);
-  const [speed, setSpeed] = useState(50);
-  const [pitch, setPitch] = useState(40);
+  const [voicesList, setVoicesList] = useState([]);
+  const [selectedVoice, setSelectedVoice] = useState(null);
+  const [volume, setVolume] = useState(50);
+  const [speed, setSpeed] = useState(1);
+  const [pitch, setPitch] = useState(1);
 
   return (
     <div className="w-screen h-screen p-4 bg-red-500 flex flex-col">
@@ -172,9 +189,13 @@ function App() {
           <header className="w-full h-28 bg-green-500">
             <button
               className="btn"
-              onClick={() => document.getElementById("my_modal_3").showModal()}
+              onClick={() => {
+                document.getElementById("my_modal_3").showModal();
+                setIsPaused(true);
+                stopPlayingText();
+              }}
             >
-              open modal
+              voice settings
             </button>
             <dialog id="my_modal_3" className="modal p-4 w-full h-full">
               <div className="w-full modal-box max-h-screen h-full rounded-lg p-4 flex flex-col">
@@ -185,47 +206,48 @@ function App() {
 
                 <div className="dropdown">
                   <div tabIndex={0} role="button" className="btn m-1">
-                    Click
+                    {selectedVoice.name}
                   </div>
                   <ul
                     tabIndex={0}
                     className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
                   >
-                    <li>
-                      <a>Item 1</a>
-                    </li>
-                    <li>
-                      <a>Item 2</a>
-                    </li>
+                    {voicesList.map((voice) => (
+                      <li
+                        key={voice.name}
+                        className="menu-item"
+                        onClick={() => {
+                          setSelectedVoice(voice);
+                        }}
+                      >
+                        <a>{voice.name}</a>
+                      </li>
+                    ))}
                   </ul>
                 </div>
-                <div className="flex flex-col gap-4">
-                  <input
-                    id="volume"
-                    type="range"
+                <div className="flex flex-col gap-10">
+                  <Slider
+                    sliderName={"Volume"}
+                    sliderValue={volume}
+                    setSliderValue={setVolume}
                     min={0}
-                    max="100"
-                    value={volume}
-                    onChange={(e) => setVolume(e.target.value)}
-                    className="range range-primary"
+                    max={100}
                   />
-                  <input
-                    id="Speed"
-                    type="range"
-                    min={0}
-                    max="100"
-                    value={speed}
-                    onChange={(e) => setSpeed(e.target.value)}
-                    className="range range-primary"
+                  <Slider
+                    sliderName={"Speed"}
+                    sliderValue={speed}
+                    setSliderValue={setSpeed}
+                    stepSize={0.5}
+                    min={0.5}
+                    max={5}
                   />
-                  <input
-                    id="Pitch"
-                    type="range"
+                  <Slider
+                    sliderName={"Pitch"}
+                    sliderValue={pitch}
+                    setSliderValue={setPitch}
+                    stepSize={0.25}
                     min={0}
-                    max="100"
-                    value={pitch}
-                    onChange={(e) => setPitch(e.target.value)}
-                    className="range range-primary"
+                    max={2}
                   />
                 </div>
               </div>

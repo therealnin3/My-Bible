@@ -13,8 +13,6 @@ function DropDown({
 }) {
   if (maxNumber) {
     const numbers = [...Array(maxNumber).keys()];
-
-    console.log(numbers);
     return (
       <div className="dropdown dropdown-bottom dropdown-end">
         <div tabIndex={0} role="button" className="btn m-1">
