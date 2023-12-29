@@ -134,10 +134,21 @@ function App() {
       },
     });
 
-    const response = await fetch("/My-Bible/Bible.json");
-    const data = await response.json();
-    const tx = db.transaction("myObjectStore", "readwrite");
-    await tx.store.put(data, "bibleData");
+    let data;
+    try {
+      const response = await fetch("/My-Bible/Bible.json");
+      data = await response.json();
+      const tx = db.transaction("myObjectStore", "readwrite");
+      await tx.store.put(data, "bibleData");
+    } catch (error) {
+      console.log("Fetch failed, trying to load from IndexedDB");
+      const storedData = await db.get("myObjectStore", "bibleData");
+      if (storedData) {
+        data = storedData;
+      } else {
+        console.log("No data found in IndexedDB");
+      }
+    }
 
     setBible(data);
     setBookNames(data.map((book) => book.name));
@@ -189,7 +200,7 @@ function App() {
   const [pitch, setPitch] = useState(1);
 
   return (
-    <div className="flex h-screen w-screen flex-col bg-base-100 p-9 text-base-content">
+    <div className="flex h-screen w-screen flex-col overflow-y-auto bg-base-100 p-9 text-base-content">
       {displaySkeleton || Bible === null ? (
         <div>SKELETON</div>
       ) : (

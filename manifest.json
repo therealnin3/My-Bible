@@ -1,5 +1,5 @@
 {
-    "short_name": "AB",
+    "short_name": "Audio Bible",
     "name": "Audio Bible",
     "icons": [
       {
@@ -9,7 +9,7 @@
       }
     ],
     "start_url": "/My-Bible/",
-    "background_color": "#ffffff",
+    "background_color": "oklch(var(--b1))",
     "theme_color": "#000000",
     "display": "standalone"
    }
