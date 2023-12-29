@@ -205,7 +205,7 @@ function App() {
         <div>SKELETON</div>
       ) : (
         <div className="flex h-full w-full flex-col gap-3">
-          <header className="flex w-full flex-row items-center justify-between">
+          <header className="flex w-full flex-row items-center justify-between px-5 pb-3">
             <FiExternalLink className="text-primary" size={20} />
             <div className="flex flex-row items-center gap-2">
               <FiBook size={20} />
@@ -322,7 +322,7 @@ function App() {
               </div>
             </div>
           </main>
-          <footer className="flex w-full flex-col items-center justify-center gap-3 rounded-lg bg-base-300 px-5 py-3">
+          <footer className="flex w-full flex-col items-center justify-center gap-3 rounded-lg bg-base-300 p-5">
             <progress
               className="progress progress-primary w-full"
               value={progressBar}

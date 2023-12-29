@@ -20,7 +20,7 @@ function DropDown({
         <div
           tabIndex={0}
           role="button"
-          className="flex flex-row items-center gap-2"
+          className="flex flex-row items-center gap-2 bg-blue-500"
         >
           {icon === "left" && (
             <FiChevronDown size={20} className="text-primary" />
@@ -33,11 +33,11 @@ function DropDown({
 
         <ul
           tabIndex={0}
-          className="menu dropdown-content z-[1] flex h-52 w-fit flex-col overflow-y-auto rounded-box bg-base-100 p-2 shadow"
+          className="menu dropdown-content z-[1] m-0 flex h-[300px] w-fit flex-col items-center overflow-y-auto rounded-box bg-base-200 p-2 shadow"
         >
           {numbers.map((number) => (
             <li
-              className="w-fit"
+              className="m-0 flex h-fit w-fit items-center justify-center p-0"
               key={number}
               onClick={() => {
                 setSelectedItem(number);
