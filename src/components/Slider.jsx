@@ -9,10 +9,10 @@ function Slider({
   stepSize,
 }) {
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col">
       <label>{sliderName}</label>
-      <div className="flex flex-row items-center gap-2">
-        <div className="flex flex-col gap-2 w-full">
+      <div className="flex flex-row items-center gap-4">
+        <div className="relative flex w-full flex-col gap-2">
           <input
             id="volume"
             type="range"
@@ -22,21 +22,22 @@ function Slider({
             value={sliderValue}
             onChange={(e) => setSliderValue(e.target.value)}
             className="range range-primary"
-          />{" "}
+          />
+          {/* Range if given */}
           {stepSize && (
-            <div className="w-full flex justify-between text-xs px-2">
+            <div className="absolute top-8 flex w-full justify-between px-2 text-xs">
               {Array.from(
                 { length: Math.floor((max - min) / stepSize) + 1 },
-                (_, i) => min + i * stepSize
+                (_, i) => min + i * stepSize,
               ).map((value, index) => (
                 <span key={index}>{value}</span>
               ))}
             </div>
           )}
         </div>
-        <label className="px-4 py-3 w-16 flex items-center justify-center border border-primary rounded-lg">
-          {sliderValue}
-        </label>
+        <div className="flex h-10 w-12 items-center justify-center rounded-lg border border-primary">
+          <label className="">{sliderValue}</label>
+        </div>
       </div>
     </div>
   );

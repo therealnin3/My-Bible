@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { openDB } from "idb";
 import Slider from "./components/Slider";
 import "./index.css";
+import { FiChevronDown } from "react-icons/fi";
 
 //TODO: BUG -- select big chapter, switch to book with fewer chapters
 
@@ -33,6 +34,7 @@ function App() {
   const bookRef = useRef(0); // Create a ref for bookRef
   const chapterRef = useRef(0); // Create a ref for chapterRef
   const verseRef = useRef(0); // Create a ref for verseRef
+  const [displayAllVoices, setDisplayAllVoices] = useState(false); // State for displaying all voices
 
   // Sync the state and ref values
   useEffect(() => {
@@ -221,42 +223,66 @@ function App() {
             >
               <FiSettings className="text-primary" size={20} />
             </button>
-            <dialog id="my_modal_3" className="modal h-full w-full p-4">
-              <div className="modal-box flex h-full max-h-screen w-full flex-col rounded-lg p-4">
-                <form method="dialog">
-                  {/* if there is a button in form, it will close the modal */}
-                  <button className="btn">X</button>
-                </form>
-
-                <div className="dropdown">
-                  <div tabIndex={0} role="button" className="btn m-1">
-                    {selectedVoice.name}
+            <dialog
+              id="my_modal_3"
+              className="modal flex h-full w-full items-center justify-center p-4"
+            >
+              <div className="modal-box flex h-fit w-full flex-col rounded-lg p-8">
+                <label className="text-md flex w-full items-center justify-center px-4 pb-4 font-bold">
+                  Voice Settings
+                </label>
+                <div className="flex w-full flex-col pb-4">
+                  <div className="flex w-full flex-row gap-3">
+                    <div
+                      onClick={() => setDisplayAllVoices(!displayAllVoices)}
+                      className="flex w-full flex-row gap-3 rounded-lg bg-base-200 px-4 py-2"
+                    >
+                      <div className="flex flex-1 flex-col">
+                        <label className="text-md font-semibold">
+                          {selectedVoice.name}
+                        </label>
+                        <label className="text-sm">{selectedVoice.lang}</label>
+                      </div>
+                      <FiChevronDown
+                        className="flex h-full items-center justify-center text-primary"
+                        size={24}
+                      />
+                    </div>
                   </div>
-                  <ul
-                    tabIndex={0}
-                    className="menu dropdown-content z-[1] w-52 rounded-box bg-base-100 p-2 shadow"
-                  >
-                    {voicesList.map((voice) => (
-                      <li
-                        key={voice.name}
-                        className="menu-item"
-                        onClick={() => {
-                          setSelectedVoice(voice);
-                        }}
-                      >
-                        <a>{voice.name}</a>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="relative w-full">
+                    {displayAllVoices && (
+                      <div className="absolute left-0 top-1 z-50 h-[290px] w-full overflow-auto rounded-lg bg-base-300 px-4 py-2 shadow-lg">
+                        {voicesList.map((voice) => (
+                          <div
+                            onClick={() => {
+                              setSelectedVoice(voice);
+                              setDisplayAllVoices(false);
+                            }}
+                          >
+                            {voice.name === selectedVoice.name ? (
+                              <div className="flex flex-col rounded-lg bg-primary px-2 py-1 text-primary-content">
+                                <label className="text-md font-semibold">
+                                  {selectedVoice.name}
+                                </label>
+                                <label className="text-sm">
+                                  {selectedVoice.lang}
+                                </label>
+                              </div>
+                            ) : (
+                              <div className="flex flex-col rounded-lg px-2 py-1 hover:bg-base-100">
+                                <label className="text-md font-semibold">
+                                  {voice.name}
+                                </label>
+                                <label className="text-sm">{voice.lang}</label>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="flex flex-col gap-10">
-                  <Slider
-                    sliderName={"Volume"}
-                    sliderValue={volume}
-                    setSliderValue={setVolume}
-                    min={0}
-                    max={100}
-                  />
+                <div className="flex flex-col gap-8">
                   <Slider
                     sliderName={"Speed"}
                     sliderValue={speed}
@@ -273,6 +299,19 @@ function App() {
                     min={0}
                     max={2}
                   />
+                  <Slider
+                    sliderName={"Volume"}
+                    sliderValue={volume}
+                    setSliderValue={setVolume}
+                    min={0}
+                    max={100}
+                  />
+                  <form method="dialog">
+                    {/* if there is a button in form, it will close the modal */}
+                    <button className="btn btn-outline btn-primary  flex w-full items-center justify-center">
+                      Save and close
+                    </button>
+                  </form>
                 </div>
               </div>
             </dialog>
@@ -342,25 +381,19 @@ function App() {
                 className="fill-base-content text-base-content"
               />
 
-              <div className="rounded-full bg-base-content p-4">
+              <div
+                onClick={() => {
+                  isPaused
+                    ? startPlayingText(Bible[book].chapters[chapter][verse])
+                    : stopPlayingText();
+                  setIsPaused(!isPaused);
+                }}
+                className="rounded-full bg-base-content p-4"
+              >
                 {isPaused ? (
-                  <FiPlay
-                    onClick={() => {
-                      startPlayingText(Bible[book].chapters[chapter][verse]);
-                      setIsPaused(false);
-                    }}
-                    size={24}
-                    className="fill-base-300 text-base-300"
-                  />
+                  <FiPlay size={24} className="fill-base-300 text-base-300" />
                 ) : (
-                  <FiPause
-                    onClick={() => {
-                      stopPlayingText();
-                      setIsPaused(true);
-                    }}
-                    size={24}
-                    className="fill-base-300 text-base-300"
-                  />
+                  <FiPause size={24} className="fill-base-300 text-base-300" />
                 )}
               </div>
 
