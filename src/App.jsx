@@ -22,7 +22,6 @@ import DropDown from "./components/DropDown";
 
 function App() {
   // Variables - Display
-  const [displaySkeleton, setDisplaySkeleton] = useState(true);
   const [isPaused, setIsPaused] = useState(true);
 
   // Variables - Bible
@@ -35,12 +34,17 @@ function App() {
   const chapterRef = useRef(0); // Create a ref for chapterRef
   const verseRef = useRef(0); // Create a ref for verseRef
   const [displayAllVoices, setDisplayAllVoices] = useState(false); // State for displaying all voices
+  const [bibleCreationFinished, setBibleCreationFinsihed] = useState(false); // State for displaying all voices
 
   // Sync the state and ref values
   useEffect(() => {
     bookRef.current = book;
     chapterRef.current = chapter;
     verseRef.current = verse;
+
+    if (Bible) {
+      saveLastReadPosition();
+    }
   }, [book, chapter, verse]);
 
   // When user selects a new book by dropdown, reset chapter and verse
@@ -66,7 +70,7 @@ function App() {
 
     const populateVoices = () => {
       setVoicesList(synth.getVoices());
-      setSelectedVoice(synth.getVoices()[0]);
+      // setSelectedVoice(synth.getVoices()[0]);
     };
 
     populateVoices();
@@ -132,7 +136,11 @@ function App() {
   async function createDatabase() {
     const db = await openDB("myDatabase", 1, {
       upgrade(db) {
-        db.createObjectStore("myObjectStore");
+        return Promise.all([
+          db.createObjectStore("myObjectStore"),
+          db.createObjectStore("settings"),
+          db.createObjectStore("lastReadPosition"),
+        ]);
       },
     });
 
@@ -154,8 +162,70 @@ function App() {
 
     setBible(data);
     setBookNames(data.map((book) => book.name));
-    setDisplaySkeleton(false);
+
+    // Load settings
+    let settings;
+    try {
+      settings = await db.get("settings", "userSettings");
+    } catch (error) {
+      console.log("Failed to load settings from IndexedDB");
+    }
+    if (settings) {
+      const voice = window.speechSynthesis.getVoices().find((voice) => {
+        return (
+          voice.name === settings.selectedVoiceName &&
+          voice.lang === settings.selectedVoiceLang
+        );
+      });
+      setSelectedVoice(voice);
+      setVolume(settings.volume);
+      setSpeed(settings.speed);
+      setPitch(settings.pitch);
+    } else {
+      setSelectedVoice(window.speechSynthesis.getVoices()[0]);
+    }
+
+    // Load last read position
+    let lastReadPosition;
+    try {
+      lastReadPosition = await db.get("lastReadPosition", "position");
+    } catch (error) {
+      console.log("Failed to load last read position from IndexedDB");
+    }
+    if (lastReadPosition) {
+      setBook(lastReadPosition.book);
+      setChapter(lastReadPosition.chapter);
+      setVerse(lastReadPosition.verse);
+    }
+
+    setBibleCreationFinsihed(true);
   }
+
+  // Save voice settings
+  const saveVoiceSettings = async () => {
+    console.log("started saving...");
+    const settings = {
+      selectedVoiceName: selectedVoice.name,
+      selectedVoiceLang: selectedVoice.lang,
+      volume: volume,
+      speed: speed,
+      pitch: pitch,
+    };
+    const db = await openDB("myDatabase", 1);
+    await db.put("settings", settings, "userSettings");
+    console.log("saved!", settings);
+  };
+
+  // Save last read position
+  const saveLastReadPosition = async () => {
+    const position = {
+      book: book,
+      chapter: chapter,
+      verse: verse,
+    };
+    const db = await openDB("myDatabase", 1);
+    await db.put("lastReadPosition", position, "position");
+  };
 
   // Text to speech
   const [progressBar, setProgressBar] = useState(0);
@@ -203,7 +273,7 @@ function App() {
 
   return (
     <div className="flex h-screen w-screen flex-col overflow-y-auto bg-base-100 p-9 text-base-content">
-      {displaySkeleton || Bible === null ? (
+      {bibleCreationFinished === false ? (
         <div>SKELETON</div>
       ) : (
         <div className="flex h-full w-full flex-col gap-3">
@@ -308,7 +378,10 @@ function App() {
                   />
                   <form method="dialog">
                     {/* if there is a button in form, it will close the modal */}
-                    <button className="btn btn-outline btn-primary  flex w-full items-center justify-center">
+                    <button
+                      onClick={() => saveVoiceSettings()}
+                      className="btn btn-outline btn-primary  flex w-full items-center justify-center"
+                    >
                       Save and close
                     </button>
                   </form>
