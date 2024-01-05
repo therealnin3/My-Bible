@@ -23,6 +23,7 @@ import DropDown from "./components/DropDown";
 function App() {
   // Variables - Display
   const [isPaused, setIsPaused] = useState(true);
+  const [displayAllVoices, setDisplayAllVoices] = useState(false); // State for displaying all voices
 
   // Variables - Bible
   const [Bible, setBible] = useState(null);
@@ -33,8 +34,8 @@ function App() {
   const bookRef = useRef(0); // Create a ref for bookRef
   const chapterRef = useRef(0); // Create a ref for chapterRef
   const verseRef = useRef(0); // Create a ref for verseRef
-  const [displayAllVoices, setDisplayAllVoices] = useState(false); // State for displaying all voices
   const [bibleCreationFinished, setBibleCreationFinsihed] = useState(false); // State for displaying all voices
+  const [defaultVoice, setDefaultVoice] = useState(null); // State for displaying all voices
 
   // Sync the state and ref values
   useEffect(() => {
@@ -69,8 +70,9 @@ function App() {
     const synth = window.speechSynthesis;
 
     const populateVoices = () => {
-      setVoicesList(synth.getVoices());
-      // setSelectedVoice(synth.getVoices()[0]);
+      const list = synth.getVoices();
+      setVoicesList(list);
+      setDefaultVoice(list.find((voice) => voice.default === true));
     };
 
     populateVoices();
@@ -311,7 +313,11 @@ function App() {
                         <label className="text-md font-semibold">
                           {selectedVoice.name}
                         </label>
-                        <label className="text-sm">{selectedVoice.lang}</label>
+                        <label className="text-sm">
+                          {selectedVoice.lang}
+                          {selectedVoice.lang === defaultVoice.lang &&
+                            " [default voice]"}
+                        </label>
                       </div>
                       <FiChevronDown
                         className="flex h-full items-center justify-center text-primary"
@@ -324,6 +330,7 @@ function App() {
                       <div className="absolute left-0 top-1 z-50 h-[290px] w-full overflow-auto rounded-lg bg-base-300 px-4 py-2 shadow-lg">
                         {voicesList.map((voice) => (
                           <div
+                            key={voice.lang + voice.name}
                             onClick={() => {
                               setSelectedVoice(voice);
                               setDisplayAllVoices(false);
@@ -336,6 +343,8 @@ function App() {
                                 </label>
                                 <label className="text-sm">
                                   {selectedVoice.lang}
+                                  {selectedVoice.lang === defaultVoice.lang &&
+                                    " [default voice]"}
                                 </label>
                               </div>
                             ) : (
@@ -343,7 +352,11 @@ function App() {
                                 <label className="text-md font-semibold">
                                   {voice.name}
                                 </label>
-                                <label className="text-sm">{voice.lang}</label>
+                                <label className="text-sm">
+                                  {voice.lang}
+                                  {voice.lang === defaultVoice.lang &&
+                                    " [default voice]"}
+                                </label>
                               </div>
                             )}
                           </div>
